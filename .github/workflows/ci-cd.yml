@@ -1,0 +1,31 @@
+name: Java CI/CD with Docker
+
+# Robot ne zaman uyanacak? Ana koda (main) yeni bir şey yüklendiğinde.
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # GitHub bize bulutta geçici bir Linux bilgisayar veriyor.
+
+    steps:
+      # 1. Adım: Projenin kodlarını buluttaki bilgisayara çek
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Adım: Buluttaki Linux'a Java 21 kurulumu yap
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      # 3. Adım: Bizim az önce bilgisayarda yaptığımız Maven paketlemesini otomatik yap (CI)
+      - name: Build with Maven (Package)
+        run: mvn clean package
+
+      # 4. Adım: Bizim az önce yaptığımız Docker build işlemini test et (CD Ön Hazırlık)
+      - name: Build Docker Image
+        run: docker build -t ilk-spring-kutum .
